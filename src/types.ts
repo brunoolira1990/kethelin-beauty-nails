@@ -11,6 +11,8 @@ export interface Client {
   name: string;
   phone: string;
   instagram?: string;
+  email?: string;
+  birthDate?: string;
   notes?: string;
   allergies?: string[];
   preferredNailShape?: NailShape;
