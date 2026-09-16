@@ -1,0 +1,6 @@
+{
+  "name": "Kethelin Beauty Nails",
+  "description": "Aplicativo oficial Kethelin Beauty Nails para nail designers e manicures: agendamentos, ficha de anamnese, catálogo de serviços, controle financeiro e simulador de nail art.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
