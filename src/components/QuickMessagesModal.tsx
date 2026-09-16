@@ -61,6 +61,11 @@ export const QuickMessagesModal: React.FC<QuickMessagesModalProps> = ({
       description: 'Reative clientes que não frequentam o espaço há mais de 20 dias.',
       text: `Oi ${client ? client.name.split(' ')[0] : ''}, que saudade de você! 💕\n\nVi aqui que já faz alguns dias desde o seu último procedimento no *${studioName}*. Como estão suas unhas?\n\nQue tal tirarmos um momentinho só seu esta semana para renovar a estrutura e esmaltação? Temos horários disponíveis!\n\nMe avise que já reservo o melhor horário para você! ☕💅`,
     },
+    {
+      title: 'Solicitar Avaliação no Google Meu Negócio ⭐⭐⭐⭐⭐',
+      description: 'Peça uma avaliação 5 estrelas no Google logo após o atendimento para atrair mais clientes.',
+      text: `Oie ${client ? client.name.split(' ')[0] : 'linda'}! Passando para agradecer com muito carinho por sua confiança hoje no *${studioName}*! 🌸✨\n\nVocê poderia nos dar uma forcinha deixando uma rápida avaliação 5 estrelas no nosso *Google Meu Negócio*? Leva menos de 1 minutinho e nos ajuda muito a crescer:\n\n⭐ https://www.google.com/maps/search/?api=1&query=Kethelin+Beauty+Nails+Rua+Edmar+Matosinho+10+Maua+SP\n\nMuito obrigada pelo carinho e até a próxima! 💖💅`,
+    },
   ];
 
   const handleCopy = (text: string, index: number) => {

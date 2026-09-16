@@ -6,8 +6,27 @@ export const STUDIO_INFO = {
   phoneRaw: '5511952517402',
   instagram: '@Nail_kethelinxz',
   instagramUrl: 'https://instagram.com/Nail_kethelinxz',
-  address: 'Rua Edmar Matosinho, número 10',
+  address: 'Rua Edmar Matosinho, 10 - Parque Bandeirantes, Mauá - SP',
+  googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Rua+Edmar+Matosinho+10+Maua+SP',
+  googleReviewsUrl: 'https://www.google.com/maps/search/?api=1&query=Kethelin+Beauty+Nails+Rua+Edmar+Matosinho+10+Maua+SP',
+  googleRating: 5.0,
+  googleReviewCount: 0,
 };
+
+export interface GoogleReview {
+  id: string;
+  author: string;
+  avatarColor: string;
+  avatarLetter: string;
+  rating: number;
+  date: string;
+  service: string;
+  comment: string;
+  verified: boolean;
+}
+
+// Inicialmente vazio para não exibir avaliações fakes/fictícias
+export const GOOGLE_REVIEWS: GoogleReview[] = [];
 
 export const INITIAL_SERVICES: ServiceItem[] = [
   {
@@ -79,257 +98,12 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
 ];
 
-export const INITIAL_CLIENTS: Client[] = [
-  {
-    id: 'cli-1',
-    name: 'Camila Ferreira',
-    phone: '(11) 98765-4321',
-    instagram: '@camila.ferreira',
-    notes: 'Prefere corte amendoado. Muito pontual.',
-    allergies: [],
-    preferredNailShape: 'amendoada',
-    preferredColors: 'Tons Nude, Vermelho Queimado e Francesinha',
-    cuticleType: 'fina',
-    nailIssues: [],
-    createdAt: '2026-01-10',
-    totalSpent: 680,
-    appointmentsCount: 8,
-    lastVisit: '2026-09-02',
-  },
-  {
-    id: 'cli-2',
-    name: 'Beatriz Albuquerque',
-    phone: '(11) 97654-3210',
-    instagram: '@bia_albuquerque',
-    notes: 'Alérgica a esmaltes com formaldeído e tolueno. Usar sempre linha hipoalergênica.',
-    allergies: ['Formaldeído', 'Tolueno'],
-    preferredNailShape: 'quadrada',
-    preferredColors: 'Preto, Vinho, Azul Escuro',
-    cuticleType: 'sensivel' as any,
-    nailIssues: ['Quebradiça'],
-    createdAt: '2026-02-15',
-    totalSpent: 420,
-    appointmentsCount: 4,
-    lastVisit: '2026-08-28',
-  },
-  {
-    id: 'cli-3',
-    name: 'Juliana Mendes',
-    phone: '(11) 99123-4567',
-    instagram: '@juju.mendes',
-    notes: 'Usuária de fibra de vidro há 8 meses. Ama encapsuladas e babyboomer.',
-    allergies: [],
-    preferredNailShape: 'bailarina',
-    preferredColors: 'Rosa claro, Glitters e Degradê',
-    cuticleType: 'normal',
-    nailIssues: [],
-    createdAt: '2025-11-20',
-    totalSpent: 1350,
-    appointmentsCount: 11,
-    lastVisit: '2026-09-10',
-  },
-  {
-    id: 'cli-4',
-    name: 'Mariana Duarte',
-    phone: '(11) 98234-5678',
-    instagram: '@mari_duarte',
-    notes: 'Roedora em recuperação, fazendo blindagem para fortalecer.',
-    allergies: [],
-    preferredNailShape: 'redonda',
-    preferredColors: 'Cores pastéis e Nude rosado',
-    cuticleType: 'ressecada',
-    nailIssues: ['Roedora', 'Unhas curtas'],
-    createdAt: '2026-04-05',
-    totalSpent: 510,
-    appointmentsCount: 5,
-    lastVisit: '2026-09-05',
-  },
-  {
-    id: 'cli-5',
-    name: 'Patrícia Rocha',
-    phone: '(11) 99876-5432',
-    instagram: '@patyrocha_adv',
-    notes: 'Advogada, sempre mantém esmaltação impecável para audiências.',
-    allergies: [],
-    preferredNailShape: 'quadrada',
-    preferredColors: 'Vermelho clássico e Branquinho Renda',
-    cuticleType: 'normal',
-    nailIssues: [],
-    createdAt: '2026-03-12',
-    totalSpent: 790,
-    appointmentsCount: 9,
-    lastVisit: '2026-09-12',
-  },
-];
+// Iniciar zerado para uso real de produção
+export const INITIAL_CLIENTS: Client[] = [];
 
-// Helper to get formatted dates
-const today = new Date().toISOString().split('T')[0];
-const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-const afterTomorrow = new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0];
+export const INITIAL_APPOINTMENTS: Appointment[] = [];
 
-export const INITIAL_APPOINTMENTS: Appointment[] = [
-  {
-    id: 'apt-1',
-    clientId: 'cli-1',
-    clientName: 'Camila Ferreira',
-    clientPhone: '(11) 98765-4321',
-    serviceIds: ['srv-esmalte-gel', 'srv-nail-art'],
-    serviceNames: ['Esmaltação em Gel', 'Nail Art & Decoração'],
-    date: today,
-    time: '09:30',
-    durationMinutes: 65,
-    totalPrice: 55,
-    status: 'confirmado',
-    notes: 'Quer esmaltação em tom nude com filha única encapsulada em folha de ouro.',
-    paymentMethod: 'pix',
-    paid: false,
-  },
-  {
-    id: 'apt-2',
-    clientId: 'cli-3',
-    clientName: 'Juliana Mendes',
-    clientPhone: '(11) 99123-4567',
-    serviceIds: ['srv-fibra'],
-    serviceNames: ['Alongamento em Fibra de Vidro'],
-    date: today,
-    time: '11:15',
-    durationMinutes: 120,
-    totalPrice: 70,
-    status: 'confirmado',
-    notes: 'Alongamento em fibra de vidro, manter formato bailarina.',
-    paymentMethod: 'pix',
-    paid: false,
-  },
-  {
-    id: 'apt-3',
-    clientId: 'cli-5',
-    clientName: 'Patrícia Rocha',
-    clientPhone: '(11) 99876-5432',
-    serviceIds: ['srv-molde-f1'],
-    serviceNames: ['Alongamento no Molde F1'],
-    date: today,
-    time: '14:30',
-    durationMinutes: 90,
-    totalPrice: 65,
-    status: 'agendado',
-    notes: 'Molde F1 formato amendoado.',
-    paymentMethod: 'pix',
-    paid: false,
-  },
-  {
-    id: 'apt-4',
-    clientId: 'cli-4',
-    clientName: 'Mariana Duarte',
-    clientPhone: '(11) 98234-5678',
-    serviceIds: ['srv-banho-gel'],
-    serviceNames: ['Banho em Gel / Blindagem'],
-    date: tomorrow,
-    time: '10:00',
-    durationMinutes: 60,
-    totalPrice: 55,
-    status: 'confirmado',
-    notes: 'Banho de gel para fortalecimento das unhas naturais.',
-    paymentMethod: 'pix',
-    paid: false,
-  },
-  {
-    id: 'apt-5',
-    clientId: 'cli-2',
-    clientName: 'Beatriz Albuquerque',
-    clientPhone: '(11) 97654-3210',
-    serviceIds: ['srv-esmalte-gel'],
-    serviceNames: ['Esmaltação em Gel'],
-    date: afterTomorrow,
-    time: '15:30',
-    durationMinutes: 50,
-    totalPrice: 45,
-    status: 'agendado',
-    notes: 'LEMBRETE: Usar apenas esmaltes hipoalergênicos.',
-    paymentMethod: 'pix',
-    paid: false,
-  },
-  {
-    id: 'apt-6',
-    clientId: 'cli-1',
-    clientName: 'Camila Ferreira',
-    clientPhone: '(11) 98765-4321',
-    serviceIds: ['srv-3'],
-    serviceNames: ['Combo Pé e Mão Tradicional'],
-    date: yesterday,
-    time: '16:00',
-    durationMinutes: 90,
-    totalPrice: 85,
-    status: 'concluido',
-    notes: 'Atendimento perfeito, adorou a cor.',
-    paymentMethod: 'pix',
-    paid: true,
-  },
-];
-
-export const INITIAL_TRANSACTIONS: Transaction[] = [
-  {
-    id: 'tx-1',
-    date: today,
-    time: '09:00',
-    type: 'saida',
-    description: 'Reposição de lixas descartáveis, luvas de nitrila e algodão',
-    amount: 68.5,
-    category: 'materiais',
-    paymentMethod: 'pix',
-  },
-  {
-    id: 'tx-2',
-    date: yesterday,
-    time: '17:35',
-    type: 'entrada',
-    description: 'Atendimento Camila Ferreira - Combo Pé e Mão',
-    amount: 85,
-    category: 'servico',
-    paymentMethod: 'pix',
-    appointmentId: 'apt-6',
-  },
-  {
-    id: 'tx-3',
-    date: yesterday,
-    time: '14:20',
-    type: 'entrada',
-    description: 'Atendimento Fernanda Costa - Alongamento Fibra',
-    amount: 180,
-    category: 'servico',
-    paymentMethod: 'cartao_credito',
-  },
-  {
-    id: 'tx-4',
-    date: yesterday,
-    time: '11:00',
-    type: 'saida',
-    description: 'Compra de 3 géis construtores Vòlia Classic Cover',
-    amount: 195,
-    category: 'materiais',
-    paymentMethod: 'cartao_credito',
-  },
-  {
-    id: 'tx-5',
-    date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0],
-    time: '15:00',
-    type: 'entrada',
-    description: 'Atendimento Juliana Mendes - Manutenção Fibra',
-    amount: 120,
-    category: 'servico',
-    paymentMethod: 'pix',
-  },
-  {
-    id: 'tx-6',
-    date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0],
-    time: '18:10',
-    type: 'entrada',
-    description: 'Atendimento Mariana Duarte - Blindagem Diamante',
-    amount: 100,
-    category: 'servico',
-    paymentMethod: 'dinheiro',
-  },
-];
+export const INITIAL_TRANSACTIONS: Transaction[] = [];
 
 export const INITIAL_POLISHES: PolishItem[] = [
   { id: 'pol-1', name: 'Renda Clássico', brand: 'Risqué', colorHex: '#FDFCF7', finish: 'cremoso', inStock: true, category: 'francesinha' },

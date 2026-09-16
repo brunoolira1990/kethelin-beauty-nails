@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrandLogo } from './BrandLogo';
-import { STUDIO_INFO } from '../data/initialData';
+import { STUDIO_INFO, GOOGLE_REVIEWS, GoogleReview } from '../data/initialData';
 import { ServiceItem } from '../types';
+import { AddReviewModal } from './AddReviewModal';
+import { GoogleBusinessModal } from './GoogleBusinessModal';
+import {
+  getGoogleBusinessConfig,
+  saveGoogleBusinessConfig,
+  GoogleBusinessConfig,
+} from '../utils/googleBusiness';
 import {
   Calendar,
   Sparkles,
@@ -18,6 +25,11 @@ import {
   HelpCircle,
   Share2,
   Lock,
+  ExternalLink,
+  MessageSquarePlus,
+  Settings,
+  QrCode,
+  Store,
 } from 'lucide-react';
 
 interface LandingPageViewProps {
@@ -38,6 +50,30 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
   isManicureLoggedIn = false,
 }) => {
   const activeServices = services.filter((s) => s.active);
+
+  // Real Reviews State - persisted in localStorage
+  const [reviews, setReviews] = useState<GoogleReview[]>(() => {
+    try {
+      const saved = localStorage.getItem('kethelin_real_reviews_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error(e);
+    }
+    return GOOGLE_REVIEWS;
+  });
+  const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
+  const [isGoogleBusinessModalOpen, setIsGoogleBusinessModalOpen] = useState(false);
+  const [googleConfig, setGoogleConfig] = useState<GoogleBusinessConfig>(() =>
+    getGoogleBusinessConfig()
+  );
+
+  const googleReviewsUrl = googleConfig.reviewUrl;
+
+  const handleAddReview = (newRev: GoogleReview) => {
+    const updated = [newRev, ...reviews];
+    setReviews(updated);
+    localStorage.setItem('kethelin_real_reviews_v1', JSON.stringify(updated));
+  };
 
   const keyServices = [
     {
@@ -88,8 +124,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       <header className="relative overflow-hidden pt-6 pb-16 sm:pb-24 border-b border-rose-100/60 bg-gradient-to-b from-white via-rose-50/20 to-[#FAF8F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Navigation */}
-          <div className="flex items-center justify-between pb-8 border-b border-stone-100">
-            <BrandLogo size="md" showText={true} />
+          <div className="flex items-center justify-between pb-6 sm:pb-8 border-b border-stone-100">
+            <BrandLogo size="lg" showText={false} />
             <div className="flex items-center gap-1.5 sm:gap-3">
               {onShareClientLink && (
                 <button
@@ -184,20 +220,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   ✨ Atendimento VIP
                 </div>
 
-                <div className="text-center pb-6 border-b border-stone-100">
-                  <div className="w-24 h-24 mx-auto rounded-3xl overflow-hidden shadow-sm border border-rose-100 p-1 bg-white mb-3">
-                    <img
-                      src="/logo.jpg"
-                      alt="Kethelin Nails"
-                      className="w-full h-full object-contain rounded-2xl"
-                    />
-                  </div>
-                  <h3 className="font-['Great_Vibes',cursive] text-3xl text-[#C57E6B]">
-                    Kethelin
-                  </h3>
-                  <p className="text-[10px] uppercase font-bold tracking-[0.25em] text-stone-500">
-                    BEAUTY NAILS
-                  </p>
+                <div className="text-center pb-6 border-b border-stone-100 flex flex-col items-center">
+                  <img
+                    src="/logo.png"
+                    alt="Kethelin Beauty Nails"
+                    className="h-28 sm:h-36 w-auto object-contain transition-transform hover:scale-105 duration-300 select-none"
+                  />
                 </div>
 
                 <div className="py-4 space-y-3 text-xs text-stone-600">
@@ -323,7 +351,272 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         </div>
       </section>
 
-      {/* Location & Contact Section */}
+      {/* Google Reviews Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF8F5] via-rose-50/30 to-white border-t border-rose-100/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-stone-200 shadow-xs mb-3">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.97 0 12s.45 3.84 1.24 5.42l4.04-3.15z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                  />
+                </svg>
+                <span className="text-xs font-bold text-stone-800">
+                  Google Meu Negócio
+                </span>
+                <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                  Perfil Oficial
+                </span>
+                <span className="flex items-center text-amber-500 font-bold text-xs gap-0.5 ml-1">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  5.0
+                </span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl font-normal font-['Playfair_Display',serif] text-stone-900">
+                Avaliações no Google Meu Negócio
+              </h2>
+              <p className="text-sm text-stone-600 mt-2 max-w-2xl">
+                Depoimentos reais e perfil oficial no Google Maps ({googleConfig.address || STUDIO_INFO.address}).
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <a
+                href={googleReviewsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C57E6B] to-[#b36a57] text-white text-xs font-bold hover:shadow-md transition-all shadow-xs cursor-pointer active:scale-98"
+                title="Abrir formulário de avaliação do Google"
+              >
+                <Star className="w-3.5 h-3.5 fill-current" />
+                <span>Avaliar no Google</span>
+                <ExternalLink className="w-3 h-3 opacity-80" />
+              </a>
+
+              <a
+                href={STUDIO_INFO.googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-stone-200 text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:border-stone-300 transition-all shadow-xs cursor-pointer"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.97 0 12s.45 3.84 1.24 5.42l4.04-3.15z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                  />
+                </svg>
+                <span>Ver no Maps</span>
+                <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
+              </a>
+
+              <button
+                onClick={() => setIsGoogleBusinessModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 hover:border-stone-300 text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                title="Visualizar QR Code para placa de mesa e balcão"
+              >
+                <QrCode className="w-3.5 h-3.5 text-[#C57E6B]" />
+                <span>QR Code de Balcão</span>
+              </button>
+
+              <button
+                onClick={() => setIsAddReviewModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-[#A66E5E] text-xs font-bold transition-all border border-rose-200/60 cursor-pointer"
+              >
+                <MessageSquarePlus className="w-3.5 h-3.5" />
+                <span>Cadastrar Avaliação</span>
+              </button>
+
+              <button
+                onClick={() => setIsGoogleBusinessModalOpen(true)}
+                className="p-2.5 rounded-xl border border-stone-200 text-stone-500 hover:text-stone-900 hover:bg-white transition-colors"
+                title="Configurar Integração com Google Meu Negócio"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {reviews.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-10 h-10 rounded-full text-white font-bold flex items-center justify-center text-sm shadow-xs ${rev.avatarColor}`}
+                        >
+                          {rev.avatarLetter}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-stone-900 leading-tight">
+                            {rev.author}
+                          </h4>
+                          <span className="text-[11px] text-stone-400">
+                            {rev.date}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="w-5 h-5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity" title="Avaliação Verificada do Google Meu Negócio">
+                        <svg viewBox="0 0 24 24" className="w-full h-full">
+                          <path
+                            fill="#4285F4"
+                            d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.97 0 12s.45 3.84 1.24 5.42l4.04-3.15z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${
+                            i < rev.rating
+                              ? 'fill-amber-400 text-amber-400'
+                              : 'text-stone-300'
+                          }`}
+                        />
+                      ))}
+                      <span className="text-xs text-stone-500 font-medium ml-1">
+                        {rev.rating}.0
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-stone-600 leading-relaxed mb-4 italic">
+                      "{rev.comment}"
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                    <span className="text-[#A66E5E] font-semibold bg-rose-50 px-2 py-0.5 rounded-md">
+                      {rev.service}
+                    </span>
+                    <span className="text-emerald-700 text-[10px] font-semibold flex items-center gap-1">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      Google Meu Negócio
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-3xl p-8 sm:p-12 border border-rose-100 shadow-sm text-center max-w-2xl mx-auto">
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-xs border border-stone-200 flex items-center justify-center mx-auto mb-4 p-3">
+                <svg className="w-full h-full" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.97 0 12s.45 3.84 1.24 5.42l4.04-3.15z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                  />
+                </svg>
+              </div>
+
+              <div className="flex items-center justify-center gap-1 text-amber-500 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+
+              <h3 className="text-xl sm:text-2xl font-normal font-['Playfair_Display',serif] text-stone-900 mb-2">
+                Kethelin Beauty Nails no Google Meu Negócio
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-600 mb-6 max-w-md mx-auto leading-relaxed">
+                Integração oficial com o Google Meu Negócio. Suas avaliações reais aparecem aqui para destacar a qualidade e a segurança do estúdio em Mauá - SP.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href={googleReviewsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#C57E6B] to-[#b36a57] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Star className="w-4 h-4 fill-current" />
+                  <span>Avaliar no Google Agora</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+
+                <button
+                  onClick={() => setIsGoogleBusinessModalOpen(true)}
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 text-xs font-bold shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <QrCode className="w-4 h-4 text-[#C57E6B]" />
+                  <span>Placa de Balcão & QR Code</span>
+                </button>
+
+                <button
+                  onClick={() => setIsAddReviewModalOpen(true)}
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-[#A66E5E] text-xs font-bold transition-all border border-rose-200/60 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <MessageSquarePlus className="w-4 h-4" />
+                  <span>Cadastrar Avaliação</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 text-center">
+            <p className="text-xs text-stone-500">
+              Todas as avaliações no Google são públicas e registradas no perfil de <strong>Kethelin Beauty Nails</strong> em Mauá - SP.
+            </p>
+          </div>
+        </div>
+      </section>
       <section className="bg-white border-y border-stone-200/80 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -423,19 +716,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       <footer className="bg-stone-900 text-stone-400 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-stone-800">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white p-0.5">
-                <img src="/logo.jpg" alt="Logo" className="w-full h-full object-contain rounded-lg" />
-              </div>
-              <div>
-                <span className="font-['Great_Vibes',cursive] text-2xl text-rose-300">
-                  Kethelin
-                </span>
-                <span className="block text-[9px] uppercase tracking-widest text-stone-400">
-                  BEAUTY NAILS
-                </span>
-              </div>
-            </div>
+            <BrandLogo size="lg" showText={false} />
 
             <div className="flex flex-wrap items-center justify-center gap-6 text-xs">
               <button onClick={() => onGoToBooking()} className="hover:text-white transition-colors cursor-pointer">
@@ -456,6 +737,15 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           </div>
         </div>
       </footer>
+
+      {/* Real Review Modal */}
+      <AddReviewModal
+        isOpen={isAddReviewModalOpen}
+        onClose={() => setIsAddReviewModalOpen(false)}
+        onAddReview={handleAddReview}
+        availableServices={services.map((s) => s.name)}
+        googleReviewUrl={googleReviewsUrl}
+      />
     </div>
   );
 };

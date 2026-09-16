@@ -45,25 +45,32 @@ export default function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isShareClientLinkModalOpen, setIsShareClientLinkModalOpen] = useState(false);
 
-  // Persistence States
+  // Persistence States - Clean slate for production (services preserved, schedule and clients start fresh)
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
-    const saved = localStorage.getItem('kethelin_appointments_v1');
-    return saved ? JSON.parse(saved) : INITIAL_APPOINTMENTS;
+    if (!localStorage.getItem('kethelin_clean_v2')) {
+      localStorage.removeItem('kethelin_appointments_v1');
+      localStorage.removeItem('kethelin_clients_v1');
+      localStorage.removeItem('kethelin_transactions_v1');
+      localStorage.setItem('kethelin_clean_v2', 'true');
+      return [];
+    }
+    const saved = localStorage.getItem('kethelin_appointments_v2');
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [clients, setClients] = useState<Client[]>(() => {
-    const saved = localStorage.getItem('kethelin_clients_v1');
-    return saved ? JSON.parse(saved) : INITIAL_CLIENTS;
+    const saved = localStorage.getItem('kethelin_clients_v2');
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [services, setServices] = useState<ServiceItem[]>(() => {
-    const saved = localStorage.getItem('kethelin_services_v1');
+    const saved = localStorage.getItem('kethelin_services_v2');
     return saved ? JSON.parse(saved) : INITIAL_SERVICES;
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('kethelin_transactions_v1');
-    return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
+    const saved = localStorage.getItem('kethelin_transactions_v2');
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [polishes, setPolishes] = useState<PolishItem[]>(() => {
@@ -105,10 +112,10 @@ export default function App() {
             db.fetchTransactions(),
           ]);
 
-          if (remoteApts && remoteApts.length > 0) setAppointments(remoteApts);
-          if (remoteClients && remoteClients.length > 0) setClients(remoteClients);
+          setAppointments(remoteApts || []);
+          setClients(remoteClients || []);
           if (remoteServices && remoteServices.length > 0) setServices(remoteServices);
-          if (remoteTxs && remoteTxs.length > 0) setTransactions(remoteTxs);
+          setTransactions(remoteTxs || []);
         }
       }
     }
@@ -117,19 +124,19 @@ export default function App() {
 
   // Sync with LocalStorage
   useEffect(() => {
-    localStorage.setItem('kethelin_appointments_v1', JSON.stringify(appointments));
+    localStorage.setItem('kethelin_appointments_v2', JSON.stringify(appointments));
   }, [appointments]);
 
   useEffect(() => {
-    localStorage.setItem('kethelin_clients_v1', JSON.stringify(clients));
+    localStorage.setItem('kethelin_clients_v2', JSON.stringify(clients));
   }, [clients]);
 
   useEffect(() => {
-    localStorage.setItem('kethelin_services_v1', JSON.stringify(services));
+    localStorage.setItem('kethelin_services_v2', JSON.stringify(services));
   }, [services]);
 
   useEffect(() => {
-    localStorage.setItem('kethelin_transactions_v1', JSON.stringify(transactions));
+    localStorage.setItem('kethelin_transactions_v2', JSON.stringify(transactions));
   }, [transactions]);
 
   useEffect(() => {
@@ -437,61 +444,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-800 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
-      {/* View Mode Switcher Header Floating Pill (Quick navigation between Landing, Client Portal, Share Link and Manicure Panel) */}
-      <div className="fixed bottom-4 left-4 z-50 bg-stone-900/95 backdrop-blur-md text-white p-1.5 rounded-2xl shadow-2xl border border-stone-700/70 flex items-center gap-1 text-xs">
-        <button
-          onClick={() => changeViewMode('landing')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors cursor-pointer ${
-            viewMode === 'landing' ? 'bg-[#C57E6B] font-bold text-white shadow-xs' : 'text-stone-300 hover:text-white'
-          }`}
-          title="Ver Landing Page Oficial"
-        >
-          <Globe className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Landing Page</span>
-        </button>
-
-        <button
-          onClick={() => {
-            setSelectedServiceForBooking(undefined);
-            changeViewMode('client_portal');
-          }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors cursor-pointer ${
-            viewMode === 'client_portal' ? 'bg-[#C57E6B] font-bold text-white shadow-xs' : 'text-stone-300 hover:text-white'
-          }`}
-          title="Ver Portal da Cliente (Agendamento Online e Fidelidade)"
-        >
-          <User className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Portal da Cliente</span>
-        </button>
-
-        {/* Dedicated Share Client Link Button */}
-        <button
-          onClick={() => setIsShareClientLinkModalOpen(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-rose-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          title="Compartilhar link exclusivo da cliente"
-        >
-          <Share2 className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Compartilhar Link</span>
-        </button>
-
-        <button
-          onClick={handleGoToManicurePanel}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors cursor-pointer ${
-            viewMode === 'manicure_panel' ? 'bg-[#C57E6B] font-bold text-white shadow-xs' : 'text-stone-300 hover:text-white'
-          }`}
-          title={isManicureAuthenticated ? 'Painel de Gestão da Manicure (Ativo)' : 'Área da Manicure (Requer Login)'}
-        >
-          {isManicureAuthenticated ? (
-            <ShieldCheck className="w-3.5 h-3.5 text-rose-300" />
-          ) : (
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
-          )}
-          <span className="hidden sm:inline">
-            {isManicureAuthenticated ? 'Painel Manicure' : 'Manicure (Login)'}
-          </span>
-        </button>
-      </div>
-
       {/* 1. LANDING PAGE VIEW */}
       {viewMode === 'landing' && (
         <LandingPageView

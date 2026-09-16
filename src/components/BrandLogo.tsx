@@ -8,37 +8,32 @@ interface BrandLogoProps {
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
-  showText = true,
+  showText = false,
   className = '',
 }) => {
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-11 h-11',
-    lg: 'w-16 h-16',
-    hero: 'w-24 h-24 sm:w-28 sm:h-28',
+    sm: 'h-10 sm:h-11 w-auto max-w-[120px]',
+    md: 'h-13 sm:h-15 w-auto max-w-[160px]',
+    lg: 'h-16 sm:h-20 w-auto max-w-[200px]',
+    hero: 'h-24 sm:h-32 w-auto max-w-[280px]',
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Logo Image */}
-      <div
-        className={`${sizeClasses[size]} rounded-2xl overflow-hidden bg-white shadow-xs border border-rose-100 p-0.5 shrink-0 relative group`}
-      >
-        <img
-          src="/logo.jpg"
-          alt="Kethelin Beauty Nails Logo"
-          referrerPolicy="no-referrer"
-          className="w-full h-full object-contain rounded-xl transition-transform duration-300 group-hover:scale-105"
-          onError={(e) => {
-            // Fallback to stylized SVG if image ever fails to load
-            (e.target as HTMLElement).style.display = 'none';
-          }}
-        />
-      </div>
+    <div className={`inline-flex items-center ${className}`}>
+      {/* Transparent Logo Image without background */}
+      <img
+        src="/logo.png"
+        alt="Kethelin Beauty Nails"
+        referrerPolicy="no-referrer"
+        className={`${sizeClasses[size]} object-contain select-none shrink-0 transition-transform duration-200`}
+        onError={(e) => {
+          (e.target as HTMLElement).style.display = 'none';
+        }}
+      />
 
-      {/* Typography text branding */}
+      {/* Typography text branding (only if explicitly requested) */}
       {showText && (
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center ml-3">
           <div className="flex items-center gap-1.5">
             <span
               className="text-2xl sm:text-[26px] leading-tight font-normal text-[#C57E6B] font-['Great_Vibes',cursive] tracking-wide"

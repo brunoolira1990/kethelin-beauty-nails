@@ -101,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Logo / Studio Name */}
           <div className="flex items-center gap-3">
-            <BrandLogo size="md" showText={true} />
+            <BrandLogo size="md" showText={false} />
             <span className="hidden lg:inline-block text-[10px] uppercase tracking-wider font-semibold bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200/60 ml-1">
               Painel Manicure
             </span>
