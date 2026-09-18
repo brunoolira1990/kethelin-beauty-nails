@@ -14,10 +14,11 @@ import {
   Share2,
   LogOut,
   ShieldCheck,
+  Store,
 } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 
-export type TabType = 'agenda' | 'clientes' | 'servicos' | 'financeiro' | 'estudio';
+export type TabType = 'agenda' | 'clientes' | 'servicos' | 'financeiro' | 'estudio' | 'google';
 
 interface NavbarProps {
   currentTab: TabType;
@@ -50,7 +51,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'clientes' as TabType, label: 'Clientes & Ficha', icon: Users },
     { id: 'servicos' as TabType, label: 'Serviços & Preços', icon: Sparkles },
     { id: 'financeiro' as TabType, label: 'Financeiro', icon: DollarSign },
-    { id: 'estudio' as TabType, label: 'Esmalteca & Simulador', icon: Palette },
+    { id: 'estudio' as TabType, label: 'Esmalteca', icon: Palette },
+    { id: 'google' as TabType, label: 'Google Meu Negócio', icon: Store },
   ];
 
   return (

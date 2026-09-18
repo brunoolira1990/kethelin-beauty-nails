@@ -11,6 +11,7 @@ import { LandingPageView } from './components/LandingPageView';
 import { ClientPortalView } from './components/ClientPortalView';
 import { ManicureLoginModal } from './components/ManicureLoginModal';
 import { ShareClientLinkModal } from './components/ShareClientLinkModal';
+import { GoogleBusinessAdminView } from './components/GoogleBusinessAdminView';
 import {
   INITIAL_APPOINTMENTS,
   INITIAL_CLIENTS,
@@ -597,6 +598,10 @@ export default function App() {
                 onToggleStock={handleToggleStockPolish}
                 onDeletePolish={handleDeletePolish}
               />
+            )}
+
+            {currentTab === 'google' && (
+              <GoogleBusinessAdminView />
             )}
           </main>
 

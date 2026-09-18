@@ -746,6 +746,21 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         availableServices={services.map((s) => s.name)}
         googleReviewUrl={googleReviewsUrl}
       />
+
+      {/* Google Business Profile Modal */}
+      <GoogleBusinessModal
+        isOpen={isGoogleBusinessModalOpen}
+        onClose={() => setIsGoogleBusinessModalOpen(false)}
+        config={googleConfig}
+        onUpdateConfig={(newCfg) => setGoogleConfig(newCfg)}
+        reviews={reviews}
+        onAddReview={handleAddReview}
+        onDeleteReview={(id) => {
+          const filtered = reviews.filter((r) => r.id !== id);
+          setReviews(filtered);
+          localStorage.setItem('kethelin_real_reviews_v1', JSON.stringify(filtered));
+        }}
+      />
     </div>
   );
 };

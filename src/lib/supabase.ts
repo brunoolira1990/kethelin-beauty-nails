@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Appointment, Client, ServiceItem, Transaction, AppointmentStatus, PaymentMethod } from '../types';
+import { GoogleBusinessConfig } from '../utils/googleBusiness';
 
 // Read from env or default to configured Supabase project
 const defaultSupabaseUrl = 'https://sxmkkhcuxllayptcvdbr.supabase.co';
@@ -330,6 +331,117 @@ export const db = {
     } catch (err) {
       console.warn('Supabase deleteTransaction error:', err);
       return false;
+    }
+  },
+
+  // Google Business Configuration
+  async fetchGoogleConfig(): Promise<Partial<GoogleBusinessConfig> | null> {
+    if (!supabase) return null;
+    try {
+      // 1. First attempt: google_business_config table
+      const { data, error } = await supabase
+        .from('google_business_config')
+        .select('*')
+        .eq('id', 'default')
+        .maybeSingle();
+
+      if (!error && data) {
+        return {
+          apiKey: data.api_key || data.apiKey || '',
+          locationId: data.location_id || data.locationId || data.place_id || '',
+          placeId: data.place_id || data.placeId || data.location_id || '',
+          businessName: data.business_name || data.businessName || 'Kethelin Beauty Nails',
+          reviewUrl: data.review_url || data.reviewUrl || '',
+          updatedAt: data.updated_at || data.updatedAt || undefined,
+        };
+      }
+
+      // 2. Fallback attempt: app_settings or settings table
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('app_settings')
+        .select('*')
+        .eq('key', 'google_business')
+        .maybeSingle();
+
+      if (!settingsError && settingsData && settingsData.value) {
+        const val = typeof settingsData.value === 'string' ? JSON.parse(settingsData.value) : settingsData.value;
+        return {
+          apiKey: val.apiKey || val.api_key || '',
+          locationId: val.locationId || val.location_id || '',
+          placeId: val.placeId || val.location_id || '',
+          businessName: val.businessName || 'Kethelin Beauty Nails',
+          reviewUrl: val.reviewUrl || '',
+          updatedAt: val.updatedAt,
+        };
+      }
+
+      return null;
+    } catch (err) {
+      console.warn('Supabase fetchGoogleConfig error:', err);
+      return null;
+    }
+  },
+
+  async saveGoogleConfig(config: GoogleBusinessConfig): Promise<{ success: boolean; error?: string }> {
+    if (!supabase) {
+      return { success: false, error: 'Supabase não inicializado' };
+    }
+
+    try {
+      const now = new Date().toISOString();
+      const payload = {
+        id: 'default',
+        api_key: config.apiKey || '',
+        location_id: config.locationId || config.placeId || '',
+        place_id: config.placeId || config.locationId || '',
+        business_name: config.businessName || 'Kethelin Beauty Nails',
+        review_url: config.reviewUrl || '',
+        updated_at: now,
+      };
+
+      // 1. Try upserting to google_business_config table
+      const { error } = await supabase
+        .from('google_business_config')
+        .upsert(payload, { onConflict: 'id' });
+
+      if (!error) {
+        return { success: true };
+      }
+
+      // 2. If table doesn't exist (error code 42P01 or similar), try app_settings table
+      console.info('google_business_config table note, trying app_settings:', error.message);
+      const { error: settingsError } = await supabase
+        .from('app_settings')
+        .upsert(
+          {
+            key: 'google_business',
+            value: {
+              apiKey: config.apiKey,
+              locationId: config.locationId || config.placeId,
+              placeId: config.placeId || config.locationId,
+              businessName: config.businessName,
+              reviewUrl: config.reviewUrl,
+              updatedAt: now,
+            },
+            updated_at: now,
+          },
+          { onConflict: 'key' }
+        );
+
+      if (!settingsError) {
+        return { success: true };
+      }
+
+      return {
+        success: false,
+        error: error.message || settingsError.message || 'Erro ao gravar no Supabase',
+      };
+    } catch (err: any) {
+      console.warn('Supabase saveGoogleConfig exception:', err);
+      return {
+        success: false,
+        error: err?.message || 'Falha de comunicação com o Supabase',
+      };
     }
   },
 };

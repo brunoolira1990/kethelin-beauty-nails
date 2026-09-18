@@ -2,11 +2,14 @@ export interface GoogleBusinessConfig {
   businessName: string;
   address: string;
   placeId: string;
+  locationId: string;
+  apiKey: string;
   reviewUrl: string;
   mapsUrl: string;
   rating: number;
   reviewCount: number;
   isCustomUrlSet: boolean;
+  updatedAt?: string;
 }
 
 const STORAGE_KEY_CONFIG = 'kethelin_google_business_config_v1';
@@ -16,6 +19,8 @@ export const DEFAULT_GOOGLE_CONFIG: GoogleBusinessConfig = {
   businessName: 'Kethelin Beauty Nails',
   address: 'Rua Edmar Matosinho, 10 - Parque Bandeirantes, Mauá - SP',
   placeId: '',
+  locationId: '',
+  apiKey: '',
   // Direct Google search & review link for Kethelin Beauty Nails
   reviewUrl: 'https://www.google.com/maps/search/?api=1&query=Kethelin+Beauty+Nails+Rua+Edmar+Matosinho+10+Maua+SP',
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Rua+Edmar+Matosinho+10+Maua+SP',

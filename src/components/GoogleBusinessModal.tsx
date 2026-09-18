@@ -24,6 +24,7 @@ import {
 } from '../utils/googleBusiness';
 import { GoogleReview } from '../data/initialData';
 import { STUDIO_INFO } from '../data/initialData';
+import { db, isSupabaseConfigured } from '../lib/supabase';
 
 interface GoogleBusinessModalProps {
   isOpen: boolean;
@@ -78,6 +79,11 @@ export const GoogleBusinessModal: React.FC<GoogleBusinessModalProps> = ({
 
     onUpdateConfig(updated);
     saveGoogleBusinessConfig(updated);
+    if (isSupabaseConfigured) {
+      db.saveGoogleConfig(updated).catch((err) =>
+        console.warn('Could not save Google config to Supabase:', err)
+      );
+    }
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
